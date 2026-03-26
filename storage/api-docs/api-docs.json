@@ -1,0 +1,1201 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Restomate API",
+        "description": "API de réservation de tables de restaurant. Gérez restaurants, tables et réservations avec authentification Sanctum.",
+        "contact": {
+            "name": "Alex AGO",
+            "email": "alexyessougnonago@gmail.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://restomate-api.test/api/v1",
+            "description": "Serveur de développement"
+        }
+    ],
+    "paths": {
+        "/admin/users": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Liste tous les clients (Admin)",
+                "operationId": "b55dcb1537fb85be8bae8aeee5b46fb1",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Alex"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Utilisateurs récupérés"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users/{id}": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Détail d'un client avec historique (Admin)",
+                "operationId": "95f5fae091d1dece2b09f2afbac0cd74",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur récupéré"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "404": {
+                        "description": "Introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/users/{id}/toggle": {
+            "patch": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Activer ou désactiver un compte client (Admin)",
+                "operationId": "f837795bf71136c8c48362e01152272d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Compte activé ou désactivé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/stats": {
+            "get": {
+                "tags": [
+                    "Administration"
+                ],
+                "summary": "Statistiques globales de la plateforme (Admin)",
+                "operationId": "5cbb48cca954b44e471bf5c809bf1ef4",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques récupérées"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Inscrire un nouveau client",
+                "description": "Crée un compte client et retourne un token d'authentification",
+                "operationId": "f8f20d8e5fa3ee0d9ab537e9ac6206b5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Alex AGO"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "alex@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123",
+                                        "minLength": 8
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+22997000000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Inscription réussie"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Connecter un utilisateur",
+                "description": "Retourne un token d'authentification valide",
+                "operationId": "3d1aae0ea009e03fadebec819afd774e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "alex@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie"
+                    },
+                    "401": {
+                        "description": "Identifiants incorrects"
+                    },
+                    "403": {
+                        "description": "Compte désactivé"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Déconnecter l'utilisateur",
+                "operationId": "0f604af450f66d99a17c511d6067a1c9",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentification"
+                ],
+                "summary": "Profil de l'utilisateur connecté",
+                "operationId": "1482ae868da3ac9ed15d4972dc1724ec",
+                "responses": {
+                    "200": {
+                        "description": "Profil récupéré"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations": {
+            "get": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Toutes les réservations (Admin)",
+                "operationId": "c0ead7ee8da750a341eeff509f3af8b9",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "confirmed",
+                                "cancelled",
+                                "no_show"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-04-01"
+                        }
+                    },
+                    {
+                        "name": "restaurant_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réservations récupérées"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Créer une réservation (Client)",
+                "operationId": "ab4d7952bb3ef1ccd7724e8d862b034b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "table_id",
+                                    "reservation_date",
+                                    "start_time",
+                                    "number_of_guests"
+                                ],
+                                "properties": {
+                                    "table_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "reservation_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-04-01"
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "19:30"
+                                    },
+                                    "number_of_guests": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "special_requests": {
+                                        "type": "string",
+                                        "example": "Allergie aux noix, anniversaire"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Réservation créée"
+                    },
+                    "409": {
+                        "description": "Table non disponible"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/my": {
+            "get": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Mes réservations (Client connecté)",
+                "operationId": "da10b02490ecac708ba3fcd0f2de94a6",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pending",
+                                "confirmed",
+                                "cancelled",
+                                "no_show"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réservations récupérées"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}": {
+            "get": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Détail d'une réservation",
+                "operationId": "49499ada3f4d3680e147782d33573252",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réservation récupérée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "404": {
+                        "description": "Introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Modifier une réservation",
+                "operationId": "4a219e5cfd9760d12da084929201d042",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "reservation_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-04-02"
+                                    },
+                                    "start_time": {
+                                        "type": "string",
+                                        "example": "20:00"
+                                    },
+                                    "number_of_guests": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "special_requests": {
+                                        "type": "string",
+                                        "example": "Table près de la fenêtre"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Réservation mise à jour"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Impossible de modifier"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}/cancel": {
+            "patch": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Annuler une réservation",
+                "operationId": "70237665fb6d7ef14914c29ac4190d5d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réservation annulée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Annulation impossible"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}/confirm": {
+            "patch": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Confirmer une réservation (Admin)",
+                "operationId": "adeb83734efe5b5a98da3b1bd237a791",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Réservation confirmée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Statut incorrect"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reservations/{id}/no-show": {
+            "patch": {
+                "tags": [
+                    "Réservations"
+                ],
+                "summary": "Marquer no-show (Admin)",
+                "description": "Marque une réservation comme no-show quand le client ne s'est pas présenté",
+                "operationId": "8ccacf5e373317293cff33e8cdccf3cf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Marqué no-show"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Statut incorrect"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/restaurants": {
+            "get": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Liste tous les restaurants",
+                "description": "Retourne la liste paginée des restaurants actifs",
+                "operationId": "c2732fde08b6fb1b998768e0212d072a",
+                "parameters": [
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Cotonou"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Chez Mama"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Créer un restaurant (Admin)",
+                "operationId": "047e8f41ad48124b86b8af32562c6353",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "address",
+                                    "city",
+                                    "opening_time",
+                                    "closing_time"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Chez Mama Africa"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Restaurant africain"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Rue des Cocotiers"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Cotonou"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+22997000000"
+                                    },
+                                    "opening_time": {
+                                        "type": "string",
+                                        "example": "08:00"
+                                    },
+                                    "closing_time": {
+                                        "type": "string",
+                                        "example": "23:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Restaurant créé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/restaurants/{id}": {
+            "get": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Détail d'un restaurant",
+                "operationId": "fda112636f3f0744367f22ebf61831fd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant récupéré"
+                    },
+                    "404": {
+                        "description": "Introuvable"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Modifier un restaurant (Admin)",
+                "operationId": "9d8efb7a86aeee93cfc1b54dd9f56763",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nouveau nom"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Porto-Novo"
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Restaurant mis à jour"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Restaurants"
+                ],
+                "summary": "Archiver un restaurant (Admin)",
+                "operationId": "992e6ded6ad1babc7467060e4f35bbdd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restaurant archivé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/restaurants/{restaurantId}/tables": {
+            "get": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Liste les tables d'un restaurant",
+                "operationId": "8a05cd7e6d301a2d2aa1d185bbdd1069",
+                "parameters": [
+                    {
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tables récupérées"
+                    },
+                    "404": {
+                        "description": "Restaurant introuvable"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Créer une table (Admin)",
+                "operationId": "cc0cbf2435d20a1189cf5e25c77fdfec",
+                "parameters": [
+                    {
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "capacity",
+                                    "location"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Table VIP 1"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 4
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "terrasse",
+                                        "enum": [
+                                            "intérieur",
+                                            "terrasse",
+                                            "bar",
+                                            "privé"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Table créée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/restaurants/{restaurantId}/tables/available": {
+            "get": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Tables disponibles selon date, heure et capacité",
+                "description": "Retourne les tables disponibles pour un créneau donné",
+                "operationId": "d3b2f9d830d8399ce40e487d609575f7",
+                "parameters": [
+                    {
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2026-04-01"
+                        }
+                    },
+                    {
+                        "name": "start_time",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "19:30"
+                        }
+                    },
+                    {
+                        "name": "guests",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 4
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tables disponibles retournées"
+                    },
+                    "422": {
+                        "description": "Hors des horaires du restaurant"
+                    }
+                }
+            }
+        },
+        "/restaurants/{restaurantId}/tables/{tableId}": {
+            "put": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Modifier une table (Admin)",
+                "operationId": "8f49c7c713653686e72d90c5c70c1bff",
+                "parameters": [
+                    {
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "tableId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Table A"
+                                    },
+                                    "capacity": {
+                                        "type": "integer",
+                                        "example": 6
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Table mise à jour"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Tables"
+                ],
+                "summary": "Archiver une table (Admin)",
+                "operationId": "36e22475f8d0fea6c1699b58d85d0be7",
+                "parameters": [
+                    {
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "tableId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Table archivée"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Entre ton token Sanctum obtenu après login",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentification",
+            "description": "Inscription, connexion, profil"
+        },
+        {
+            "name": "Restaurants",
+            "description": "Gestion des restaurants"
+        },
+        {
+            "name": "Tables",
+            "description": "Gestion des tables"
+        },
+        {
+            "name": "Réservations",
+            "description": "Gestion des réservations"
+        },
+        {
+            "name": "Administration",
+            "description": "Gestion admin des utilisateurs"
+        }
+    ]
+}
